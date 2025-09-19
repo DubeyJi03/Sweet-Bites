@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+#root{
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+/* Slideshow animations */
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.6s ease forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+/* Custom styles for slick slider */
+.slick-dots {
+  bottom: 25px;
+}
+
+.slick-dots li button:before {
+  color: white;
+  opacity: 0.5;
+  font-size: 10px;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #f59e0b; /* amber-500 */
+  opacity: 1;
+}
+
+/* Custom styles for filter sidebar */
+.filter-sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #f59e0b transparent;
+}
+
+.filter-sidebar-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #f59e0b;
+  border-radius: 3px;
+}
+
+.filter-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #d97706;
+}
+
+/* Custom range slider styles */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #f59e0b;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #f59e0b;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Focus styles for accessibility */
+.slider:focus::-webkit-slider-thumb {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+.slider:focus::-moz-range-thumb {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
