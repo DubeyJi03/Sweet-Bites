@@ -19,7 +19,7 @@ import UserManagement from "./components/Admin/UserManagement";
 import ProductManagement from "./components/Admin/ProductManagement";
 import EditProductPage from "./components/Admin/EditProductPage";
 import OrderManagement from "./components/Admin/OrderManagement";
-import AllSweetsPage from "./pages/AllSweetsPage";
+// import AllSweetsPage from "./pages/AllSweetsPage";
 import LadoosPage from "./pages/LadoosPage";
 import MithaiPage from "./pages/MithaiPage";
 import ContactUsPage from "./pages/ContactUsPage";
@@ -28,7 +28,6 @@ import AboutUsPage from "./pages/AboutUsPage";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import ProtectedRoute from "./components/Common/ProtectedRoute";
-import AddProduct from "./components/Admin/AddProduct";
 
 const App = () => {
   return (
