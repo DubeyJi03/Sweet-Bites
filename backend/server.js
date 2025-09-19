@@ -19,7 +19,14 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// 💡 Explicit CORS Configuration to resolve the error
+const corsOptions = {
+    origin: 'https://sweet-bites-tau.vercel.app', // Replace this with your Vercel frontend domain
+    optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+    credentials: true, // This allows cookies and authorization headers to be sent
+};
+app.use(cors(corsOptions));
 
 // Connect to MongoDB
 connectDB();
@@ -27,7 +34,7 @@ connectDB();
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
-  res.send("WELCOME TO CREAMYCAKE&CO API!");
+    res.send("WELCOME TO CREAMYCAKE&CO API!");
 });
 
 // API Routes
@@ -47,7 +54,5 @@ app.use("/api/admin/products", productAdminRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+    console.log(`✅ Server running at http://localhost:${PORT}`);
 });
-
-
