@@ -68,7 +68,6 @@ const App = () => {
       <Route path="products" element={<ProductManagement/>} />
       <Route path="/admin/products/:id" element={<EditProductPage/>} />
       <Route path="orders" element={<OrderManagement/>}/>
-      <Route path="/admin/products/new" element={<AddProduct/>} />
     </Route>
     </Routes>
     </BrowserRouter>
