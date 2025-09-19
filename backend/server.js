@@ -22,7 +22,7 @@ app.use(express.json());
 
 // 💡 Explicit CORS Configuration to resolve the error
 const corsOptions = {
-    origin: 'https://sweet-bites-tau.vercel.app', // Replace this with your Vercel frontend domain
+    origin: 'https://sweet-bites-ur.vercel.app', // Replace this with your Vercel frontend domain
     optionsSuccessStatus: 200, // Some legacy browsers choke on 204
     credentials: true, // This allows cookies and authorization headers to be sent
 };
