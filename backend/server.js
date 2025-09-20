@@ -41,6 +41,7 @@ app.use(
 );
 
 // ✅ Serve static images
+const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 // Connect to MongoDB

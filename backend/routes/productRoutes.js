@@ -1,32 +1,39 @@
 // Filename: productRoutes.js
 const express = require("express");
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const { protect, admin } = require("../middleware/authMiddleware");
-const mongoose = require("mongoose");
 
 const router = express.Router();
 
-// Helper: format images into { url, altText }
+/**
+ * Helper: Format images into { url, altText }
+ */
 const formatImages = (images = [], name = "") => {
-  const baseUrl = process.env.BASE_URL || "https://sweet-bites-five.vercel.app";
+  const baseUrl = process.env.BASE_URL || "http://localhost:9000"; // ✅ fallback
   return images.map((img) => {
+    if (!img) return null; // filter out bad values
     if (typeof img === "string") {
       return {
         url: img.startsWith("http") ? img : `${baseUrl}/uploads/${img}`,
-        altText: name,
+        altText: name || "Product Image",
       };
     } else {
       return {
-        url: img.url?.startsWith("http") ? img.url : `${baseUrl}/uploads/${img.url}`,
-        altText: img.altText || name,
+        url: img.url?.startsWith("http")
+          ? img.url
+          : `${baseUrl}/uploads/${img.url}`,
+        altText: img.altText || name || "Product Image",
       };
     }
-  });
+  }).filter(Boolean);
 };
 
-// @route POST /api/products
-// @desc Create Product
-// @access Private/Admin
+/**
+ * @route   POST /api/products
+ * @desc    Create Product
+ * @access  Private/Admin
+ */
 router.post("/", protect, admin, async (req, res) => {
   try {
     const {
@@ -68,20 +75,22 @@ router.post("/", protect, admin, async (req, res) => {
       weight,
       sku,
       user: req.user._id,
-      sold: 0, // new products start with 0 sales
+      sold: 0, // ✅ initialize sales count
     });
 
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
   } catch (error) {
     console.error("Product creation failed:", error.message);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
 
-// @route PUT /api/products/:id
-// @desc Update product
-// @access Private/Admin
+/**
+ * @route   PUT /api/products/:id
+ * @desc    Update Product
+ * @access  Private/Admin
+ */
 router.put("/:id", protect, admin, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -112,36 +121,41 @@ router.put("/:id", protect, admin, async (req, res) => {
       sold,
     } = req.body;
 
-    product.name = name || product.name;
-    product.description = description || product.description;
-    product.price = price || product.price;
-    product.discountPrice = discountPrice || product.discountPrice;
-    product.countInStock = countInStock || product.countInStock;
-    product.category = category || product.category;
-    product.weights = weights || product.weights;
-    product.collections = collections || product.collections;
-    product.sweetType = sweetType || product.sweetType;
-    product.types = types || product.types;
-    product.images = images ? formatImages(images, name || product.name) : product.images;
-    product.isFeatured = isFeatured !== undefined ? isFeatured : product.isFeatured;
-    product.isPublished = isPublished !== undefined ? isPublished : product.isPublished;
-    product.tags = tags || product.tags;
-    product.dimensions = dimensions || product.dimensions;
-    product.weight = weight || product.weight;
-    product.sku = sku || product.sku;
-    product.sold = sold !== undefined ? sold : product.sold;
+    // ✅ Safe field updates
+    product.name = name ?? product.name;
+    product.description = description ?? product.description;
+    product.price = price ?? product.price;
+    product.discountPrice = discountPrice ?? product.discountPrice;
+    product.countInStock = countInStock ?? product.countInStock;
+    product.category = category ?? product.category;
+    product.weights = weights ?? product.weights;
+    product.collections = collections ?? product.collections;
+    product.sweetType = sweetType ?? product.sweetType;
+    product.types = types ?? product.types;
+    product.images = images
+      ? formatImages(images, name || product.name)
+      : product.images;
+    product.isFeatured = isFeatured ?? product.isFeatured;
+    product.isPublished = isPublished ?? product.isPublished;
+    product.tags = tags ?? product.tags;
+    product.dimensions = dimensions ?? product.dimensions;
+    product.weight = weight ?? product.weight;
+    product.sku = sku ?? product.sku;
+    product.sold = sold ?? product.sold;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);
   } catch (error) {
     console.error("Update product error:", error.message);
-    res.status(500).send("Server Error");
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
 
-// @route DELETE /api/products/:id
-// @desc Delete product
-// @access Private/Admin
+/**
+ * @route   DELETE /api/products/:id
+ * @desc    Delete Product
+ * @access  Private/Admin
+ */
 router.delete("/:id", protect, admin, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -155,13 +169,15 @@ router.delete("/:id", protect, admin, async (req, res) => {
     res.status(200).json({ message: "Product removed" });
   } catch (error) {
     console.error("Delete product error:", error.message);
-    res.status(500).send("Server Error");
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
 
-// @route GET /api/products
-// @desc Get all products with filters
-// @access Public
+/**
+ * @route   GET /api/products
+ * @desc    Get all products with filters
+ * @access  Public
+ */
 router.get("/", async (req, res) => {
   try {
     const {
@@ -180,9 +196,11 @@ router.get("/", async (req, res) => {
     let query = { isPublished: true };
 
     if (category && category.toLowerCase() !== "all") query.category = category;
-    if (collection && collection.toLowerCase() !== "all") query.collections = { $in: [collection] };
+    if (collection && collection.toLowerCase() !== "all")
+      query.collections = { $in: [collection] };
     if (types && types.toLowerCase() !== "all") query.types = { $in: [types] };
-    if (sweetType && sweetType.toLowerCase() !== "all") query.sweetType = sweetType;
+    if (sweetType && sweetType.toLowerCase() !== "all")
+      query.sweetType = sweetType;
     if (weights) query.weights = { $in: weights.split(",") };
 
     if (minPrice || maxPrice) {
@@ -201,16 +219,32 @@ router.get("/", async (req, res) => {
 
     let sort = {};
     switch (sortBy) {
-      case "priceAsc": sort = { price: 1 }; break;
-      case "priceDesc": sort = { price: -1 }; break;
-      case "newest": sort = { createdAt: -1 }; break;
-      case "oldest": sort = { createdAt: 1 }; break;
-      case "name": sort = { name: 1 }; break;
-      case "featured": sort = { isFeatured: -1, createdAt: -1 }; break;
-      default: sort = { createdAt: -1 };
+      case "priceAsc":
+        sort = { price: 1 };
+        break;
+      case "priceDesc":
+        sort = { price: -1 };
+        break;
+      case "newest":
+        sort = { createdAt: -1 };
+        break;
+      case "oldest":
+        sort = { createdAt: 1 };
+        break;
+      case "name":
+        sort = { name: 1 };
+        break;
+      case "featured":
+        sort = { isFeatured: -1, createdAt: -1 };
+        break;
+      default:
+        sort = { createdAt: -1 };
     }
 
-    const products = await Product.find(query).sort(sort).limit(Number(limit) || 0);
+    const products = await Product.find(query)
+      .sort(sort)
+      .limit(Number(limit) || 0);
+
     res.json(products);
   } catch (error) {
     console.error("GET /api/products error:", error.message);
@@ -218,9 +252,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// @route GET /api/products/best-seller
-// @desc Retrieve best-selling products
-// @access Public
+/**
+ * @route   GET /api/products/best-seller
+ * @desc    Retrieve top 10 best-selling products
+ * @access  Public
+ */
 router.get("/best-seller", async (req, res) => {
   try {
     const bestSellers = await Product.find({ isPublished: true })
@@ -234,26 +270,32 @@ router.get("/best-seller", async (req, res) => {
     }
   } catch (error) {
     console.error("Best-seller error:", error.message);
-    res.status(500).send("Server error");
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
 
-// @route GET /api/products/new-arrivals
-// @desc retrieve latest 8 products
-// @access Public
+/**
+ * @route   GET /api/products/new-arrivals
+ * @desc    Retrieve latest 8 products
+ * @access  Public
+ */
 router.get("/new-arrivals", async (req, res) => {
   try {
-    const newArrivals = await Product.find().sort({ createdAt: -1 }).limit(8);
+    const newArrivals = await Product.find({ isPublished: true })
+      .sort({ createdAt: -1 })
+      .limit(8);
     res.json(newArrivals);
   } catch (error) {
     console.error("New arrivals error:", error.message);
-    res.status(500).send("Server Error");
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
 
-// @route GET /api/products/:id
-// @desc get a single product by ID
-// @access Public
+/**
+ * @route   GET /api/products/:id
+ * @desc    Get single product by ID
+ * @access  Public
+ */
 router.get("/:id", async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -268,13 +310,15 @@ router.get("/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Get product by ID error:", error.message);
-    res.status(500).send("Server Error");
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
 
-// @route GET /api/products/similar/:id
-// @desc retrieve similar products
-// @access Public
+/**
+ * @route   GET /api/products/similar/:id
+ * @desc    Retrieve similar products
+ * @access  Public
+ */
 router.get("/similar/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -294,7 +338,7 @@ router.get("/similar/:id", async (req, res) => {
     res.json(similarProducts);
   } catch (error) {
     console.error("Similar products error:", error.message);
-    res.status(500).send("Server Error");
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
 
