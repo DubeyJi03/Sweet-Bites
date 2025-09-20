@@ -19,10 +19,25 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+
+// ✅ Allowed origins: local + deployed frontend
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://sweet-bites-lsfx.vercel.app",
+];
+
 const corsOptions = {
-    origin: 'http://localhost:5173', 
-    credentials: true, // This is needed if you are sending cookies or tokens
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // If you send cookies/tokens
 };
+
 app.use(cors(corsOptions));
 
 // Connect to MongoDB
@@ -31,7 +46,7 @@ connectDB();
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
-    res.send("WELCOME TO CREAMYCAKE&CO API!");
+  res.send("WELCOME TO CREAMYCAKE&CO API!");
 });
 
 // API Routes
@@ -51,5 +66,5 @@ app.use("/api/admin/products", productAdminRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 
 app.listen(PORT, () => {
-    console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
