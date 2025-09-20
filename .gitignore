@@ -9,6 +9,3 @@ backend/node_modules
 #Environment variables
 frontend/.env
 backend/.env
-
-Thumbs.db
-Desktop.ini
