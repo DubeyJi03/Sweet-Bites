@@ -1409,7 +1409,7 @@ const products = [
     sweetType: "mithai",
     weights: ["250g", "500g", "1kg", "2kg"],
     collections: "Mithai Collection",
-    images: [{ url: "/src/assets/chocobarfi.jpg", altText: "Chocolate mithai balls" }],
+    images: [{ url: "/chocobarfi.jpg", altText: "Chocolate mithai balls" }],
   },
   {
     name: "Dry Fruit Ladoo",
