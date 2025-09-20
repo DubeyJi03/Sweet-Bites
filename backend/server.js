@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const path = require("path");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -20,25 +21,27 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// ✅ Allowed origins: local + deployed frontend
+// ✅ CORS setup
 const allowedOrigins = [
   "http://localhost:5173",
   "https://sweet-bites-lsfx.vercel.app",
 ];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // If you send cookies/tokens
-};
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
-app.use(cors(corsOptions));
+// ✅ Serve static images
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 // Connect to MongoDB
 connectDB();
