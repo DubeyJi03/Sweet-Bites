@@ -19,12 +19,9 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-
-// 💡 Explicit CORS Configuration to resolve the error
 const corsOptions = {
-    origin: 'https://sweet-bites-ur.vercel.app', // Replace this with your Vercel frontend domain
-    optionsSuccessStatus: 200, // Some legacy browsers choke on 204
-    credentials: true, // This allows cookies and authorization headers to be sent
+    origin: 'http://localhost:5173', 
+    credentials: true, // This is needed if you are sending cookies or tokens
 };
 app.use(cors(corsOptions));
 
